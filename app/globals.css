@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  background-color: #1e40af; /* blue-800 - average of your gradient */
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
