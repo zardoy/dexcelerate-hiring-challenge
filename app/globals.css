@@ -4,6 +4,7 @@
 
 body {
   background-color: #1e40af; /* blue-800 - average of your gradient */
+  color-scheme: dark;
 }
 
 @layer utilities {

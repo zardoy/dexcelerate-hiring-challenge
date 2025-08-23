@@ -1,8 +1,26 @@
-# Dexcelerate Hiring Challenge
+# Dexcelerate Hiring Challenge - React Scanner Tables
 
 ## Overview
 
-Dexcelerate is a platform that allows users to create and share their own DeFi strategies. The Dexcelerate Hiring Challenge is a competition where Dexcelerate users can submit their strategies for review and judging.
+A React component that displays two side-by-side tables for cryptocurrency token data with real-time updates via WebSocket connections. Built for the Dexcelerate hiring challenge to showcase frontend development skills.
+
+## Features
+
+- **Two side-by-side tables**: "Trending Tokens" and "New Tokens"
+- **Real-time data updates** via WebSocket connections
+- **Token information display** with logos from Dextools API
+- **Social links integration** using real data from pair stats
+- **Audit status indicators** with clear visual feedback
+- **Responsive design** with smooth animations
+- **Filtering capabilities** for chains and other parameters
+
+## License
+
+**Copyright (c) 2025 @zardoy - All rights reserved.**
+
+This software is provided for **educational and non-commercial use only**. Commercial use is strictly prohibited without explicit written permission.
+
+See [LICENSE](LICENSE) file for full terms and conditions.
 
 ## Rules
 

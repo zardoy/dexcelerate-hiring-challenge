@@ -3,6 +3,8 @@
 import { useState, useEffect, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import type { TokenData } from "@/types/scanner"
+import { TokenInfo } from "./token-info"
+import { formatSmallNumber, formatNumber, clampAddress } from "@/lib/utils"
 
 const formatShortTimeAgo = (date: Date) => {
   try {
@@ -81,23 +83,9 @@ export function TokenTable({ tokens, loading, sortBy, onSubscribePairStats }: To
     }
   }
 
-  const formatPrice = (price: number) => {
-    if (price < 0.001) return `$${price.toExponential(2)}`
-    return `$${price.toFixed(6)}`
-  }
-
-  const formatMcap = (mcap: number) => {
-    if (mcap >= 1e9) return `$${(mcap / 1e9).toFixed(2)}B`
-    if (mcap >= 1e6) return `$${(mcap / 1e6).toFixed(2)}M`
-    if (mcap >= 1e3) return `$${(mcap / 1e3).toFixed(2)}K`
-    return `$${mcap.toFixed(2)}`
-  }
-
-  const formatVolume = (volume: number) => {
-    if (volume >= 1e6) return `$${(volume / 1e6).toFixed(2)}M`
-    if (volume >= 1e3) return `$${(volume / 1e3).toFixed(2)}K`
-    return `$${volume.toFixed(2)}`
-  }
+  const formatPrice = (price: number) => `$${formatSmallNumber(price)}`
+  const formatMcap = (mcap: number) => `$${formatNumber(mcap)}`
+  const formatVolume = (volume: number) => `$${formatNumber(volume)}`
 
   const getPriceChangeColor = (change: number) => {
     if (change > 0) return "text-green-400"
@@ -135,7 +123,7 @@ export function TokenTable({ tokens, loading, sortBy, onSubscribePairStats }: To
       animate={{ opacity: 1, y: 0 }}
       className="bg-gradient-to-br from-slate-800/30 to-slate-900/30 backdrop-blur-xl rounded-2xl overflow-hidden border border-slate-700/50 shadow-2xl"
     >
-      <div className="overflow-x-auto overflow-y-auto h-full min-w-0">
+      <div className="overflow-x-auto overflow-y-auto min-w-0">
         <table className="w-full text-sm min-w-[800px]">
           <thead className="bg-gradient-to-r from-slate-800/80 to-slate-700/80 backdrop-blur-sm sticky top-0">
             <tr>
@@ -200,20 +188,18 @@ export function TokenTable({ tokens, loading, sortBy, onSubscribePairStats }: To
                   exit={{ opacity: 0, x: 20 }}
                   transition={{ delay: index * 0.02 }}
                   whileHover={{
-                    backgroundColor: "rgba(51, 65, 85, 0.3)",
-                    scale: 1.01,
                   }}
-                  className="border-t border-slate-700/30 transition-all duration-200"
+                  className="border-t border-slate-700/30 transition-all duration-200 hover:bg-slate-700/50"
                 >
                   <td className="px-4 py-3">
-                    <div>
-                      <div className="font-semibold text-white">{token.tokenName}</div>
-                      <div className="text-slate-400 text-xs">
-                        {token.token0Symbol}/{token.token1Symbol} • {token.chain}
-                      </div>
+                    <TokenInfo token={token} />
+                  </td>
+                  <td className="px-4 py-3 text-slate-300">
+                    <div className="text-xs">
+                      <div className="font-medium">{clampAddress(token.exchange || "Unknown")}</div>
+                      <div className="text-slate-500 text-xs">Router</div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-slate-300">{token.exchange}</td>
                   <td className="px-4 py-3 text-right font-mono text-white">{formatPrice(token.priceUsd)}</td>
                   <td className="px-4 py-3 text-right font-mono text-white">{formatMcap(token.mcap)}</td>
                   <td className="px-4 py-3 text-right font-mono text-white">{formatVolume(token.volumeUsd)}</td>
@@ -222,28 +208,28 @@ export function TokenTable({ tokens, loading, sortBy, onSubscribePairStats }: To
                     className={`px-4 py-3 text-right font-mono font-bold ${getPriceChangeColor(token.priceChangePcs["5m"])}`}
                   >
                     {token.priceChangePcs["5m"] > 0 ? "+" : ""}
-                    {token.priceChangePcs["5m"].toFixed(1)}%
+                    {formatNumber(token.priceChangePcs["5m"], 1)}%
                   </motion.td>
                   <motion.td
                     whileHover={{ scale: 1.1 }}
                     className={`px-4 py-3 text-right font-mono font-bold ${getPriceChangeColor(token.priceChangePcs["1h"])}`}
                   >
                     {token.priceChangePcs["1h"] > 0 ? "+" : ""}
-                    {token.priceChangePcs["1h"].toFixed(1)}%
+                    {formatNumber(token.priceChangePcs["1h"], 1)}%
                   </motion.td>
                   <motion.td
                     whileHover={{ scale: 1.1 }}
                     className={`px-4 py-3 text-right font-mono font-bold ${getPriceChangeColor(token.priceChangePcs["6h"])}`}
                   >
                     {token.priceChangePcs["6h"] > 0 ? "+" : ""}
-                    {token.priceChangePcs["6h"].toFixed(1)}%
+                    {formatNumber(token.priceChangePcs["6h"], 1)}%
                   </motion.td>
                   <motion.td
                     whileHover={{ scale: 1.1 }}
                     className={`px-4 py-3 text-right font-mono font-bold ${getPriceChangeColor(token.priceChangePcs["24h"])}`}
                   >
                     {token.priceChangePcs["24h"] > 0 ? "+" : ""}
-                    {token.priceChangePcs["24h"].toFixed(1)}%
+                    {formatNumber(token.priceChangePcs["24h"], 1)}%
                   </motion.td>
                   <td className="px-4 py-3 text-right text-slate-300">
                     {token.tokenCreatedTimestamp ? formatShortTimeAgo(token.tokenCreatedTimestamp) : "N/A"}
@@ -263,31 +249,58 @@ export function TokenTable({ tokens, loading, sortBy, onSubscribePairStats }: To
                       className={`text-xs font-semibold ${getPriceChangeColor(token.liquidity.changePc)}`}
                     >
                       {token.liquidity.changePc > 0 ? "+" : ""}
-                      {token.liquidity.changePc.toFixed(1)}%
+                      {formatNumber(token.liquidity.changePc, 1)}%
                     </motion.div>
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="flex gap-1 justify-center">
+                                                      <td className="px-4 py-3">
+                    <div className="flex items-center gap-1 justify-center">
                       <motion.div
-                        whileHover={{ scale: 1.3, rotate: 180 }}
-                        className={`w-3 h-3 rounded-full transition-all duration-300 ${token.audit.contractVerified ? "bg-emerald-400 shadow-lg shadow-emerald-400/50" : "bg-slate-600"}`}
-                        title="Verified"
-                      />
+                        whileHover={{ scale: 1.1 }}
+                        className={`px-1.5 py-0.5 rounded text-xs font-medium transition-all duration-300 ${
+                          token.audit.contractVerified
+                            ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                            : "bg-slate-600/30 text-slate-500 border border-slate-500/20"
+                        }`}
+                        title={token.audit.contractVerified ? "Contract Verified" : "Contract Not Verified"}
+                      >
+                        {token.audit.contractVerified ? "✓" : "✗"}
+                      </motion.div>
+
                       <motion.div
-                        whileHover={{ scale: 1.3, rotate: 180 }}
-                        className={`w-3 h-3 rounded-full transition-all duration-300 ${token.audit.mintable ? "bg-red-400 shadow-lg shadow-red-400/50" : "bg-emerald-400 shadow-lg shadow-emerald-400/50"}`}
-                        title="Mintable"
-                      />
+                        whileHover={{ scale: 1.1 }}
+                        className={`px-1.5 py-0.5 rounded text-xs font-medium transition-all duration-300 ${
+                          !token.audit.mintable
+                            ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                            : "bg-orange-500/20 text-orange-400 border border-orange-500/30"
+                        }`}
+                        title={!token.audit.mintable ? "Mint Authority Renounced" : "Mintable (Risk)"}
+                      >
+                        {!token.audit.mintable ? "✓" : "✗"}
+                      </motion.div>
+
                       <motion.div
-                        whileHover={{ scale: 1.3, rotate: 180 }}
-                        className={`w-3 h-3 rounded-full transition-all duration-300 ${token.audit.freezable ? "bg-red-400 shadow-lg shadow-red-400/50" : "bg-emerald-400 shadow-lg shadow-emerald-400/50"}`}
-                        title="Freezable"
-                      />
+                        whileHover={{ scale: 1.1 }}
+                        className={`px-1.5 py-0.5 rounded text-xs font-medium transition-all duration-300 ${
+                          !token.audit.freezable
+                            ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
+                            : "bg-purple-500/20 text-purple-400 border border-purple-500/30"
+                        }`}
+                        title={!token.audit.freezable ? "Freeze Authority Renounced" : "Freezable (Risk)"}
+                      >
+                        {!token.audit.freezable ? "✓" : "✗"}
+                      </motion.div>
+
                       <motion.div
-                        whileHover={{ scale: 1.3, rotate: 180 }}
-                        className={`w-3 h-3 rounded-full transition-all duration-300 ${token.audit.honeypot ? "bg-red-400 shadow-lg shadow-red-400/50" : "bg-emerald-400 shadow-lg shadow-emerald-400/50"}`}
-                        title="Honeypot"
-                      />
+                        whileHover={{ scale: 1.1 }}
+                        className={`px-1.5 py-0.5 rounded text-xs font-medium transition-all duration-300 ${
+                          !token.audit.honeypot
+                            ? "bg-orange-500/20 text-orange-400 border border-orange-500/30"
+                            : "bg-red-500/20 text-red-400 border border-red-500/30"
+                        }`}
+                        title={!token.audit.honeypot ? "Not a Honeypot" : "Honeypot Detected (High Risk)"}
+                      >
+                        {!token.audit.honeypot ? "✓" : "✗"}
+                      </motion.div>
                     </div>
                   </td>
                 </motion.tr>

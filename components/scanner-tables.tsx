@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { motion } from "framer-motion"
+import { Sparkles, TrendingUp } from "lucide-react"
 import { TokenTable } from "./token-table"
 import { FilterControls } from "./filter-controls"
 import { useWebSocket } from "@/hooks/use-websocket"
@@ -118,7 +119,7 @@ export function ScannerTables() {
         <FilterControls filters={filters} onFiltersChange={setFilters} />
       </motion.div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 h-[600px] lg:h-[800px]">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 min-h-[600px] lg:min-h-[800px]">
         <motion.div
           initial={{ x: -50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
@@ -131,7 +132,10 @@ export function ScannerTables() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            🔥 Trending Tokens
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-6 h-6 text-cyan-400" />
+              Trending Tokens
+            </div>
           </motion.h2>
           <TokenTable
             tokens={filteredTrendingTokens}
@@ -161,7 +165,10 @@ export function ScannerTables() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            ✨ New Tokens
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-6 h-6 text-green-400" />
+              New Tokens
+            </div>
           </motion.h2>
           <TokenTable
             tokens={filteredNewTokens}
@@ -202,6 +209,12 @@ export function ScannerTables() {
           <span className={connected ? "text-green-400" : "text-red-400"}>
             WebSocket: {connected ? "Connected" : "Disconnected"}
           </span>
+        </div>
+
+        <div className="text-slate-400 text-sm space-y-2">
+          <p className="font-medium">© @zardoy 2025. All rights reserved.</p>
+          <p>This software is provided for educational and non-commercial use only.</p>
+          <p>Commercial use is strictly prohibited without explicit permission.</p>
         </div>
       </motion.div>
     </motion.div>

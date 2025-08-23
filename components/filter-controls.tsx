@@ -28,10 +28,10 @@ export function FilterControls({ filters, onFiltersChange }: FilterControlsProps
             onChange={(e) => updateFilter("chain", e.target.value)}
             className="w-full bg-slate-700/50 border border-slate-600/50 rounded-xl px-4 py-3 text-sm text-white backdrop-blur-sm focus:border-blue-400 focus:outline-none transition-all duration-300"
           >
-            <option value="SOL">🟣 Solana</option>
-            <option value="ETH">🔷 Ethereum</option>
-            <option value="BASE">🔵 Base</option>
-            <option value="BSC">🟡 BSC</option>
+            <option value="SOL">Solana</option>
+            <option value="ETH">Ethereum</option>
+            <option value="BASE">Base</option>
+            <option value="BSC">BSC</option>
           </motion.select>
         </motion.div>
 
@@ -72,7 +72,7 @@ export function FilterControls({ filters, onFiltersChange }: FilterControlsProps
         </motion.div>
 
         <motion.div
-          className="flex items-end"
+          className="flex items-end mb-3"
           whileHover={{ scale: 1.02 }}
           transition={{ type: "spring", stiffness: 300 }}
         >
@@ -111,7 +111,7 @@ export function FilterControls({ filters, onFiltersChange }: FilterControlsProps
             }
             className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl text-white font-semibold text-sm hover:from-blue-500 hover:to-purple-500 transition-all duration-300 shadow-lg"
           >
-            🔄 Reset
+            Reset
           </motion.button>
         </motion.div>
       </div>

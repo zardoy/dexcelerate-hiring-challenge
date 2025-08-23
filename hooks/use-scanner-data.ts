@@ -13,6 +13,18 @@ import {
   parseLiquidity
 } from "@/lib/parse-utils"
 
+// Helper function to convert chain ID to chain name
+const getChainFromId = (chainId: number): TokenData["chain"] => {
+  switch (chainId) {
+    case 1: return "ETH"
+    case 56: return "BSC"
+    case 8453: return "BASE"
+    case 1399811150: return "SOL" // Solana mainnet
+    case 900: return "SOL" // Solana testnet
+    default: return "ETH"
+  }
+}
+
 export function useScannerData(filters: FilterState) {
   const [trendingTokens, setTrendingTokens] = useState<TokenData[]>([])
   const [newTokens, setNewTokens] = useState<TokenData[]>([])
@@ -24,16 +36,16 @@ export function useScannerData(filters: FilterState) {
     return apiData.map((pair) => {
       const token: TokenData = {
         id: pair.pairAddress,
-        tokenName: pair.tokenName,
-        tokenSymbol: pair.tokenSymbol,
-        token0Symbol: pair.token0Symbol || pair.tokenSymbol,
-        token1Symbol: pair.token1Symbol || pair.tokenSymbol,
-        tokenAddress: pair.tokenAddress,
+        tokenName: pair.token1Name,
+        tokenSymbol: pair.token1Symbol,
+        token0Symbol: pair.token0Symbol,
+        token1Symbol: pair.token1Symbol,
+        tokenAddress: pair.token1Address,
         pairAddress: pair.pairAddress,
-        chain: pair.chain as TokenData["chain"],
-        exchange: pair.router || pair.virtualRouter,
+        chain: getChainFromId(pair.chainId),
+        exchange: pair.routerAddress || "No Router",
         priceUsd: safeParseFloat(pair.price),
-        volumeUsd: safeParseFloat(pair.volumeUsd),
+        volumeUsd: safeParseFloat(pair.volume),
         mcap: parseMarketCap({
           currentMcap: pair.currentMcap,
           initialMcap: pair.initialMcap,
@@ -41,25 +53,31 @@ export function useScannerData(filters: FilterState) {
           pairMcapUsdInitial: pair.pairMcapUsdInitial,
         }),
         priceChangePcs: parsePriceChanges({
-          diff5M: pair.diff5M,
-          diff1H: pair.diff1H,
-          diff6H: pair.diff6H,
-          diff24H: pair.diff24H,
+          diff5M: pair.diff5M || 0,
+          diff1H: pair.diff1H || 0,
+          diff6H: pair.diff6H || 0,
+          diff24H: pair.diff24H || 0,
         }),
         transactions: parseTransactions({
           buys: pair.buys,
           sells: pair.sells,
         }),
         audit: {
-          mintable: !pair.mintAuthorityRenounced,
-          freezable: !pair.freezeAuthorityRenounced,
-          honeypot: pair.token1IsHoneypot,
-          contractVerified: pair.isVerified,
+          mintable: !pair.isMintAuthDisabled,
+          freezable: !pair.isFreezeAuthDisabled,
+          honeypot: pair.honeyPot,
+          contractVerified: pair.contractVerified,
         },
-        tokenCreatedTimestamp: safeParseDate(pair.tokenCreatedTimestamp),
+        socialLinks: {
+          discord: pair.discordLink || undefined,
+          telegram: pair.telegramLink || undefined,
+          twitter: pair.twitterLink || undefined,
+          website: pair.webLink || undefined,
+        },
+        tokenCreatedTimestamp: safeParseDate(pair.age),
         liquidity: parseLiquidity({
-          liquidityUsd: pair.liquidityUsd,
-          liquidityChangePc: pair.liquidityChangePc,
+          liquidityUsd: pair.liquidity,
+          liquidityChangePc: pair.percentChangeInLiquidity,
         }),
       }
 
@@ -87,6 +105,12 @@ export function useScannerData(filters: FilterState) {
           limit: 100
         })
       ])
+
+      // Development-only logging
+      if (process.env.NODE_ENV === 'development') {
+        console.log('trendingData', trendingData)
+        console.log('Sample pair data:', trendingData.data.pairs[0])
+      }
 
       const transformedTrending = transformApiData(trendingData.data.pairs)
       const transformedNew = transformApiData(newData.data.pairs)
@@ -142,6 +166,12 @@ export function useScannerData(filters: FilterState) {
         freezable: !statsData.pair.freezeAuthorityRenounced,
         honeypot: statsData.pair.token1IsHoneypot,
         contractVerified: statsData.pair.isVerified,
+      },
+      socialLinks: {
+        discord: statsData.pair.linkDiscord,
+        telegram: statsData.pair.linkTelegram,
+        twitter: statsData.pair.linkTwitter,
+        website: statsData.pair.linkWebsite,
       },
     }
 
