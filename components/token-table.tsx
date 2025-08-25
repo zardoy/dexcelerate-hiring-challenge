@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import type { TokenData } from "@/types/scanner"
 import { TokenInfo } from "./token-info"
+import { TokenAudit } from "./token-audit"
 import { formatSmallNumber, formatNumber, clampAddress } from "@/lib/utils"
 
 const formatShortTimeAgo = (date: Date) => {
@@ -121,61 +122,61 @@ export function TokenTable({ tokens, loading, sortBy, onSubscribePairStats }: To
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gradient-to-br from-slate-800/30 to-slate-900/30 backdrop-blur-xl rounded-2xl overflow-hidden border border-slate-700/50 shadow-2xl"
+      className="bg-gradient-to-br from-slate-800/30 to-slate-900/30 backdrop-blur-xl rounded-2xl overflow-hidden border border-slate-700/50 shadow-2xl w-full"
     >
-      <div className="overflow-x-auto overflow-y-auto min-w-0">
-        <table className="w-full text-sm min-w-[800px]">
-          <thead className="bg-gradient-to-r from-slate-800/80 to-slate-700/80 backdrop-blur-sm sticky top-0">
+      <div className="overflow-x-auto overflow-y-auto w-full">
+        <table className="w-full text-sm">
+          <thead className="bg-slate-800/80 backdrop-blur-sm sticky top-0">
             <tr>
               <motion.th
                 whileHover={{ backgroundColor: "rgba(51, 65, 85, 0.8)" }}
-                className="px-4 py-3 text-left cursor-pointer transition-colors duration-200"
+                className="px-4 py-2 text-left cursor-pointer transition-colors duration-200"
                 onClick={() => handleSort("tokenName")}
               >
                 <span className="text-slate-300 font-semibold">Token</span>
               </motion.th>
               <motion.th
                 whileHover={{ backgroundColor: "rgba(51, 65, 85, 0.8)" }}
-                className="px-4 py-3 text-left cursor-pointer transition-colors duration-200"
+                className="px-4 py-2 text-left cursor-pointer transition-colors duration-200"
                 onClick={() => handleSort("exchange")}
               >
                 <span className="text-slate-300 font-semibold">Exchange</span>
               </motion.th>
               <motion.th
                 whileHover={{ backgroundColor: "rgba(51, 65, 85, 0.8)" }}
-                className="px-4 py-3 text-right cursor-pointer transition-colors duration-200"
+                className="px-4 py-2 text-right cursor-pointer transition-colors duration-200"
                 onClick={() => handleSort("priceUsd")}
               >
                 <span className="text-slate-300 font-semibold">Price</span>
               </motion.th>
               <motion.th
                 whileHover={{ backgroundColor: "rgba(51, 65, 85, 0.8)" }}
-                className="px-4 py-3 text-right cursor-pointer transition-colors duration-200"
+                className="px-4 py-2 text-right cursor-pointer transition-colors duration-200"
                 onClick={() => handleSort("mcap")}
               >
                 <span className="text-slate-300 font-semibold">Market Cap</span>
               </motion.th>
               <motion.th
                 whileHover={{ backgroundColor: "rgba(51, 65, 85, 0.8)" }}
-                className="px-4 py-3 text-right cursor-pointer transition-colors duration-200"
+                className="px-4 py-2 text-right cursor-pointer transition-colors duration-200"
                 onClick={() => handleSort("volumeUsd")}
               >
                 <span className="text-slate-300 font-semibold">Volume 24h</span>
               </motion.th>
-              <th className="px-4 py-3 text-right text-slate-300 font-semibold">5m</th>
-              <th className="px-4 py-3 text-right text-slate-300 font-semibold">1h</th>
-              <th className="px-4 py-3 text-right text-slate-300 font-semibold">6h</th>
-              <th className="px-4 py-3 text-right text-slate-300 font-semibold">24h</th>
+              <th className="px-4 py-2 text-right text-slate-300 font-semibold">5m</th>
+              <th className="px-4 py-2 text-right text-slate-300 font-semibold">1h</th>
+              <th className="px-4 py-2 text-right text-slate-300 font-semibold">6h</th>
+              <th className="px-4 py-2 text-right text-slate-300 font-semibold">24h</th>
               <motion.th
                 whileHover={{ backgroundColor: "rgba(51, 65, 85, 0.8)" }}
-                className="px-4 py-3 text-right cursor-pointer transition-colors duration-200"
+                className="px-4 py-2 text-right cursor-pointer transition-colors duration-200"
                 onClick={() => handleSort("tokenCreatedTimestamp")}
               >
                 <span className="text-slate-300 font-semibold">Age</span>
               </motion.th>
-              <th className="px-4 py-3 text-right text-slate-300 font-semibold">Buys/Sells</th>
-              <th className="px-4 py-3 text-right text-slate-300 font-semibold">Liquidity</th>
-              <th className="px-4 py-3 text-center text-slate-300 font-semibold">Audit</th>
+              <th className="px-4 py-2 text-right text-slate-300 font-semibold">Buys/Sells</th>
+              <th className="px-4 py-2 text-right text-slate-300 font-semibold">Liquidity</th>
+              <th className="px-4 py-2 text-center text-slate-300 font-semibold">Audit</th>
             </tr>
           </thead>
           <tbody>
@@ -252,57 +253,7 @@ export function TokenTable({ tokens, loading, sortBy, onSubscribePairStats }: To
                       {formatNumber(token.liquidity.changePc, 1)}%
                     </motion.div>
                   </td>
-                                                      <td className="px-4 py-3">
-                    <div className="flex items-center gap-1 justify-center">
-                      <motion.div
-                        whileHover={{ scale: 1.1 }}
-                        className={`px-1.5 py-0.5 rounded text-xs font-medium transition-all duration-300 ${
-                          token.audit.contractVerified
-                            ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
-                            : "bg-slate-600/30 text-slate-500 border border-slate-500/20"
-                        }`}
-                        title={token.audit.contractVerified ? "Contract Verified" : "Contract Not Verified"}
-                      >
-                        {token.audit.contractVerified ? "✓" : "✗"}
-                      </motion.div>
-
-                      <motion.div
-                        whileHover={{ scale: 1.1 }}
-                        className={`px-1.5 py-0.5 rounded text-xs font-medium transition-all duration-300 ${
-                          !token.audit.mintable
-                            ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                            : "bg-orange-500/20 text-orange-400 border border-orange-500/30"
-                        }`}
-                        title={!token.audit.mintable ? "Mint Authority Renounced" : "Mintable (Risk)"}
-                      >
-                        {!token.audit.mintable ? "✓" : "✗"}
-                      </motion.div>
-
-                      <motion.div
-                        whileHover={{ scale: 1.1 }}
-                        className={`px-1.5 py-0.5 rounded text-xs font-medium transition-all duration-300 ${
-                          !token.audit.freezable
-                            ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
-                            : "bg-purple-500/20 text-purple-400 border border-purple-500/30"
-                        }`}
-                        title={!token.audit.freezable ? "Freeze Authority Renounced" : "Freezable (Risk)"}
-                      >
-                        {!token.audit.freezable ? "✓" : "✗"}
-                      </motion.div>
-
-                      <motion.div
-                        whileHover={{ scale: 1.1 }}
-                        className={`px-1.5 py-0.5 rounded text-xs font-medium transition-all duration-300 ${
-                          !token.audit.honeypot
-                            ? "bg-orange-500/20 text-orange-400 border border-orange-500/30"
-                            : "bg-red-500/20 text-red-400 border border-red-500/30"
-                        }`}
-                        title={!token.audit.honeypot ? "Not a Honeypot" : "Honeypot Detected (High Risk)"}
-                      >
-                        {!token.audit.honeypot ? "✓" : "✗"}
-                      </motion.div>
-                    </div>
-                  </td>
+                  <TokenAudit audit={token.audit} />
                 </motion.tr>
               ))}
             </AnimatePresence>

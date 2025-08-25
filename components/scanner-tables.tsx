@@ -113,18 +113,18 @@ export function ScannerTables() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="space-y-6 min-h-screen bg-gradient-to-br from-blue-600/5 via-blue-800/5 to-slate-900/5"
+      className="space-y-6 min-h-screen bg-gradient-to-br from-blue-600/5 via-blue-800/5 to-slate-900/5 w-full px-0 sm:px-4 md:px-6 lg:px-8"
     >
       <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}>
         <FilterControls filters={filters} onFiltersChange={setFilters} />
       </motion.div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 min-h-[600px] lg:min-h-[800px]">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 min-h-[600px] lg:min-h-[800px] w-full">
         <motion.div
           initial={{ x: -50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="min-w-0"
+          className="w-full"
         >
           <motion.h2
             className="text-2xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent"
@@ -157,7 +157,7 @@ export function ScannerTables() {
           initial={{ x: 50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="min-w-0"
+          className="w-full"
         >
           <motion.h2
             className="text-2xl font-bold mb-4 bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent"

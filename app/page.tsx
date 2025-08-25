@@ -47,7 +47,7 @@ export default function Home() {
         />
       </div>
 
-      <div className="relative z-10 container mx-auto px-6 py-8">
+      <div className="relative z-10 w-full px-0 sm:px-4 md:px-6 lg:px-8 py-8">
         <motion.div
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
